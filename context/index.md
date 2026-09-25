@@ -5,8 +5,7 @@ eyes-free from an Android phone, over any Bluetooth headset or car audio. It
 turns time in the car or at the washing into review and steering time: hear
 what a session did, say what to do next, and approve or refuse a step. It
 steers the same sessions Matt uses at the desk, with his hooks, skills and
-permissions intact. The open exploration is
-`context/projects/v2v-exploration/findings.md`.
+permissions intact.
 
 ## Glossary
 
