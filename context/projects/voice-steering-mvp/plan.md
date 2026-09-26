@@ -14,13 +14,19 @@ The first slice proves the loop end to end at home: I say a prompt, a real
 session on my Mac runs it, and I hear what happened. Approvals,
 interrupting and the car come in the slices after it.
 
-## Decisions (Matt, 2026-09-25/26)
+## Decisions (Matt, 2026-09-25 and 2026-09-26)
 
 - **D1 — Hand-off sessions.** The harness drives a real Claude Code session
   on my Mac. I resume that session at the desk afterwards with my hooks,
   skills and permissions intact. The phone and the terminal never drive the
   same session at once.
-- **D2 — OPEN: what runs the session on the Mac.** See §Open decisions.
+- **D2 — `claude -p` runs each turn.** Without `--bare`, `claude -p`
+  loads the same context as an interactive session and uses my claude.ai
+  subscription login, so a voice turn costs what a desk turn costs
+  (code.claude.com/docs/en/headless). `--permission-prompt-tool` gives
+  spoken approvals a documented hook. The Agent SDK's overview tells
+  third-party developers to use API keys, which bills every turn at API
+  rates (code.claude.com/docs/en/agent-sdk/overview).
 - **D3 — Network.** The phone reaches the Mac at `matt-human`, the Mac's
   Tailscale name, which the phone already uses for web prototypes (Flux
   `phone-prototype` skill). The first slice is tested on home Wi-Fi.
@@ -31,45 +37,23 @@ interrupting and the car come in the slices after it.
 - **D5 — Native Android app built with Expo.** A browser page loses the
   microphone when the screen locks (findings §Q2). The app is a development
   build, not Expo Go.
+- **D6 — Spoken procedure words, as on a radio.** Fixed words mark intent,
+  so stray speech and loose phrasing never act:
+  - **"over"** as the last word ends my turn and sends it. Speech that does
+    not end in "over" is never sent. "Over" inside a sentence ("go over
+    the tests") does not end the turn.
+  - **"disregard"** as the last word drops what I have said this turn.
+  - **"say again"** repeats the harness's last spoken reply.
+  - **"approve"** is the only word that approves a permission prompt, and
+    **"deny"** refuses it. Any other answer makes the harness ask again.
+    The harness never reads "sure" or "go for it" as approval.
 
-## Open decisions
-
-Each needs Matt's answer before the slice that depends on it starts.
-
-**D2 — `claude -p` or the Agent SDK.** The Mac server starts one Claude
-Code run per spoken turn.
-
-- *`claude -p` (recommended).* Without `--bare`, `claude -p` loads the same
-  context as an interactive session and uses my claude.ai subscription
-  login (code.claude.com/docs/en/headless). Turns cost what desk turns
-  cost. The server parses newline-delimited JSON from stdout.
-  `--permission-prompt-tool` gives spoken approvals a documented hook.
-- *Agent SDK.* Cleaner objects, and `canUseTool` for approvals. Its
-  overview says third-party developers may not offer claude.ai login and
-  should use API keys (code.claude.com/docs/en/agent-sdk/overview). On an
-  API key every voice turn is billed at API rates on top of the
-  subscription.
-
-**D6 — What counts as a prompt.** With the microphone open, a washing
-machine, a radio or a passenger produces text. Something must stop stray
-text from reaching the session as a prompt.
-
-- *Read back and confirm (recommended).* After I stop talking, the harness
-  says "Send: <what it heard>?" and sends only on "send". It costs one short
-  exchange per turn. The same exchange later carries spoken approvals.
-- *Send every utterance.* Fastest. A misheard or overheard sentence runs.
-- *Headset button to talk.* No false prompts. It needs a button press, and
-  car head units pass media buttons through unevenly.
-
-**D7 — How the Android app gets built.** This Mac has no Android SDK
-(findings §Existing projects evaluated).
-
-- *Local Android SDK (recommended).* I install the Android command-line
-  tools and a JDK myself; the agent sandbox cannot write to their install
-  paths. Builds run on the Mac and install over USB or Wi-Fi with `adb`.
-  No account, fast rebuilds.
-- *EAS cloud builds.* Needs an Expo account and the `eas` CLI. Each native
-  change waits for a cloud build.
+  A prompt is sent as heard, with no read-back: "over" carries the intent.
+  The harness plays a short tone when it starts listening, so I know when
+  to speak.
+- **D7 — Local Android SDK.** I install the Android command-line tools and
+  a JDK myself; the agent sandbox cannot write to their install paths.
+  Builds run on the Mac and install over USB or Wi-Fi with `adb`.
 
 ## Approach
 
@@ -119,8 +103,10 @@ because nothing in it talks mid-turn.
   list. A button that starts voice mode.
 - **Voice mode.** A foreground service of type `microphone` starts from the
   setup screen, as Android 14+ requires. It routes audio to the Bluetooth
-  headset, listens with `SpeechRecognizer`, confirms per D6, sends the
-  turn, and speaks the reply with `TextToSpeech`. Then it listens again.
+  headset and listens with `SpeechRecognizer`. `SpeechRecognizer` stops at
+  each pause, so the app joins its results until the turn ends in "over"
+  or "disregard" (D6). It sends the turn and speaks the reply with
+  `TextToSpeech`. Then it listens again.
   It is half-duplex: it does not listen while it speaks. A notification
   tap ends voice mode.
 
@@ -134,16 +120,17 @@ because nothing in it talks mid-turn.
    a Kotlin Expo module. Answers findings §Q2's open check.
 2. **Probe P2 — the Mac side runs a turn.** From a script: continue a
    session I started at the desk, capture the reply and the refused tool
-   calls, and confirm the run used my subscription login. Needs D2.
+   calls, and confirm the run used my subscription login.
 3. **Slice 1 — the washing test.** Server and app as above. Done when, with
-   headphones on and the screen off, I pick a project, ask a question, hear
-   a short answer, ask a follow-up in the same session, and afterwards see
+   headphones on and the screen off, I pick a project, ask a question
+   ending in "over", hear a short answer, ask a follow-up in the same
+   session, check that speech without "over" is not sent, and afterwards see
    both turns at the desk with `claude --continue` in that checkout.
 
 ## Next slices (each gets its own plan section when it starts)
 
-- Spoken approvals through `--permission-prompt-tool`, with an extra
-  confirmation on risky steps.
+- Spoken approvals through `--permission-prompt-tool`, answered with
+  "approve" or "deny" (D6), with an extra confirmation on risky steps.
 - Interrupt: "stop" ends playback, and ends a running turn with SIGINT.
 - The car: the Mac stays awake and online while I drive, and the phone
   reaches it over mobile data.
