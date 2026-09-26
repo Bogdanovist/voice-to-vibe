@@ -120,7 +120,11 @@ because nothing in it talks mid-turn.
    a Kotlin Expo module. Answers findings §Q2's open check.
 2. **Probe P2 — the Mac side runs a turn.** From a script: continue a
    session I started at the desk, capture the reply and the refused tool
-   calls, and confirm the run used my subscription login.
+   calls, and confirm the run used my subscription login. Spike branch:
+   https://github.com/Bogdanovist/voice-to-vibe/tree/spike/claude-p-turn
+   (`spike/claude-p-turn.sh`). Matt runs it from his own terminal: inside
+   the agent sandbox `claude -p` cannot refresh the login token and fails
+   with a 401.
 3. **Slice 1 — the washing test.** Server and app as above. Done when, with
    headphones on and the screen off, I pick a project, ask a question
    ending in "over", hear a short answer, ask a follow-up in the same
