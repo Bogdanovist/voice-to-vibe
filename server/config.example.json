@@ -1,0 +1,8 @@
+{
+  "host": "100.x.y.z",
+  "port": 5180,
+  "token": "output of: openssl rand -hex 32",
+  "projects": [
+    { "name": "voice-to-vibe", "path": "/Users/you/src/personal/voice-to-vibe" }
+  ]
+}

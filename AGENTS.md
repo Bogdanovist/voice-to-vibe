@@ -9,3 +9,16 @@ connects to Claude Code, which platform carries the harness, and how speech,
 turn-taking and approvals work.
 
 Context: `context/index.md`.
+
+## Commands
+
+The Mac server (`server/`) needs Node 24 and has no runtime dependencies.
+
+- `npm test` and `npm run typecheck`, from `server/`.
+- `npm start`, from `server/`, reads `~/.config/voice-to-vibe/config.json`
+  (or the path in `VTV_CONFIG`). Copy `server/config.example.json` there.
+  `host` is the Mac's Tailscale IPv4 address (`tailscale ip -4`); the server
+  refuses any other address, because whoever reaches it can run Claude Code
+  as you. `token` is the phone's bearer token.
+- Run the server from your own terminal. Inside the agent sandbox,
+  `claude -p` cannot refresh the login token and every turn fails with a 401.
