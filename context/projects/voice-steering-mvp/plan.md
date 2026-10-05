@@ -122,14 +122,46 @@ because nothing in it talks mid-turn.
    session I started at the desk, capture the reply and the refused tool
    calls, and confirm the run used my subscription login. Spike branch:
    https://github.com/Bogdanovist/voice-to-vibe/tree/spike/claude-p-turn
-   (`spike/claude-p-turn.sh`). Matt runs it from his own terminal: inside
-   the agent sandbox `claude -p` cannot refresh the login token and fails
-   with a 401.
+   (`spike/claude-p-turn.sh`), checked out at
+   `~/src/personal/voice-to-vibe-worktrees/spike-claude-p-turn`. Matt runs
+   it from his own terminal: inside the agent sandbox `claude -p` cannot
+   refresh the login token and fails with a 401.
 3. **Slice 1 — the washing test.** Server and app as above. Done when, with
    headphones on and the screen off, I pick a project, ask a question
    ending in "over", hear a short answer, ask a follow-up in the same
    session, check that speech without "over" is not sent, and afterwards see
    both turns at the desk with `claude --continue` in that checkout.
+
+## Where it stands (2026-10-05)
+
+Paused. Resume from the first unchecked item.
+
+- [x] Plan and decisions D1–D7 approved by Matt.
+- [x] Mac server merged: PR #1, commit `2f56e66`. `npm test` passes 19
+  tests and the typecheck is clean. A live check on the Tailscale address
+  returned 401 without the token and the project list with it. No real
+  turn has run through it.
+- [x] Android toolchain installed on the Mac (checked 2026-10-05): Zulu JDK
+  17.0.20.1, and the SDK at `/opt/homebrew/share/android-commandlinetools`
+  with `platform-tools`, `platforms;android-35` and `build-tools;35.0.0`.
+  `~/.zshrc` sets `JAVA_HOME` and `ANDROID_HOME`.
+- [ ] **Matt: pair the phone for wireless `adb`.** On the phone, tap
+  Settings → About phone → Build number 7 times. Then open Developer
+  options → Wireless debugging → Pair device with pairing code. On the Mac,
+  run `adb pair <ip>:<pairing-port>`, then `adb connect <ip>:<port>` with
+  the port from the main Wireless debugging screen. `adb devices` must list
+  the phone as `device`.
+- [ ] **Matt: run P2** from his own terminal:
+  `~/src/personal/voice-to-vibe-worktrees/spike-claude-p-turn/spike/claude-p-turn.sh ~/src/personal/voice-to-vibe`.
+  It writes to `/tmp/vtv-p2/`. An agent then reads that output and records
+  the findings here. Step 5 of the probe decides how the server reports a
+  session that is busy elsewhere. The server does not return `409` until
+  then.
+- [ ] **Matt: one real turn through the server**, by the runbook in
+  `AGENTS.md` §Commands.
+- [ ] **Agent: P1**, once the phone is paired. A throwaway Expo dev build on
+  a `spike/` branch, per §Build order.
+- [ ] **Agent: slice 1 app**, once P1 and P2 are in.
 
 ## Next slices (each gets its own plan section when it starts)
 
